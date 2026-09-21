@@ -1,0 +1,21 @@
+V7 — DEPLOY FIX
+
+This fixes the Cloudflare error:
+'entry-point file at lauren-pemberton-photography/worker.js was not found'
+
+UPLOAD THE CONTENTS OF THIS FOLDER TO THE ROOT OF YOUR GITHUB REPOSITORY.
+At GitHub root you should see:
+  lauren-pemberton-photography/
+  wrangler.jsonc
+  READ-ME-FIRST.txt
+
+Inside lauren-pemberton-photography you MUST see worker.js.
+
+Keep these Cloudflare secrets:
+  LEONARD_DOWNLOAD_PASSWORD
+  HERITAGE_DOWNLOAD_PASSWORD
+
+Cloudflare deploy command:
+  npx wrangler deploy
+
+The gallery CSS is also updated to the clean four-column target layout.
