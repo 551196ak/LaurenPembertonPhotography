@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "laurenpembertonphotography",
+  "compatibility_date": "2026-09-21",
+  "main": "lauren-pemberton-photography/worker.js",
+  "assets": {
+    "directory": "lauren-pemberton-photography",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  }
+}

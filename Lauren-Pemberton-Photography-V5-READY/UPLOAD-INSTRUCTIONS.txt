@@ -1,0 +1,22 @@
+LAUREN PEMBERTON PHOTOGRAPHY — V5 READY
+
+This package fixes the missing Download button and makes the password-protected download route actually run through the Cloudflare Worker.
+
+IMPORTANT: Upload BOTH items at the repository root:
+1) the folder: lauren-pemberton-photography
+2) the file: wrangler.jsonc
+Also upload .gitignore if GitHub allows it.
+
+The root-level wrangler.jsonc is important. Your Cloudflare deploy command is "npx wrangler deploy". With this file at the repository root, Wrangler will use the included worker.js instead of auto-generating a static-only config.
+
+Keep these existing Cloudflare secrets exactly as they are:
+HERITAGE_DOWNLOAD_PASSWORD
+LEONARD_DOWNLOAD_PASSWORD
+
+After committing to GitHub, Cloudflare should redeploy automatically. In the build log, look for the Worker entry point "lauren-pemberton-photography/worker.js" and the assets directory "lauren-pemberton-photography".
+
+Then hard-refresh the live site with Ctrl+Shift+R.
+Open a gallery photo. The bottom-center viewer controls should show:
+Previous | Download | Next
+
+The Download button asks for the gallery password and only returns the file when the password matches the Cloudflare secret.
