@@ -1,0 +1,21 @@
+IMPORTANT:
+Upload the CONTENTS of this folder to the TOP LEVEL of the GitHub repository.
+
+After upload, GitHub's main page should show:
+- lauren-pemberton-photography/
+- wrangler.jsonc
+- UPLOAD-THIS-CONTENTS.txt
+
+Do NOT upload the outer Lauren-Pemberton-Photography-V6-FIXED folder as a folder.
+
+This version:
+- removes the baked-in black bars from website preview images
+- upscales/sharpens the preview images
+- uses the polished uniform gallery grid
+- includes Previous / Download / Next controls
+- keeps password-protected download handling
+- adds cache-busting so the old CSS/JS is not reused
+
+Keep the existing Cloudflare secrets:
+HERITAGE_DOWNLOAD_PASSWORD
+LEONARD_DOWNLOAD_PASSWORD
