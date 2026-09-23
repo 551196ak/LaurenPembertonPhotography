@@ -1,410 +1,1225 @@
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    const json = (data, status = 200) =>
-      Response.json(data, {
-        status,
-        headers: {
-          "Cache-Control": "no-store"
+  <title>Photo Manager | Lauren Pemberton Photography</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f7f5f2;
+      color: #252525;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #ddd;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-family: Georgia, serif;
+      font-size: 30px;
+      font-weight: 400;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #777;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 35px auto;
+      padding: 0 20px 60px;
+    }
+
+    .card {
+      background: white;
+      padding: 28px;
+      border-radius: 14px;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+      margin-bottom: 25px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-family: Georgia, serif;
+      font-weight: 400;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 13px;
+      border-radius: 7px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    input,
+    select {
+      margin-bottom: 15px;
+      background: white;
+    }
+
+    button {
+      border: none;
+      background: #252525;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .drop-zone {
+      border: 2px dashed #aaa;
+      border-radius: 12px;
+      padding: 45px 20px;
+      text-align: center;
+      margin: 20px 0;
+      background: #fafafa;
+      cursor: pointer;
+    }
+
+    .drop-zone:hover {
+      background: #f1f1f1;
+    }
+
+    .drop-zone.dragover {
+      background: #eee;
+      border-color: #333;
+    }
+
+    .drop-zone strong {
+      display: block;
+      font-size: 19px;
+      margin-bottom: 8px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 7px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .success {
+      display: block;
+      background: #e7f7ec;
+      color: #176b35;
+    }
+
+    .error {
+      display: block;
+      background: #fdeaea;
+      color: #9d2020;
+    }
+
+    .progress-wrap {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: #333;
+      transition: width 0.2s;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 18px;
+      margin-top: 25px;
+    }
+
+    .photo-card {
+      background: #fafafa;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-info {
+      padding: 10px;
+    }
+
+    .filename {
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 8px;
+    }
+
+    .delete-btn {
+      background: #8b2929;
+      font-size: 13px;
+      padding: 9px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logout {
+      width: auto;
+      padding: 10px 18px;
+      background: #777;
+    }
+
+    .selected-files {
+      margin: 15px 0;
+      color: #555;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 25px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .photo-card img {
+        height: 135px;
+      }
+
+      .top-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .logout {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Lauren Pemberton Photography</h1>
+  <p>Photo Manager</p>
+</header>
+
+<main>
+
+  <!-- LOGIN SCREEN -->
+
+  <section id="loginCard" class="card">
+
+    <h2>Photographer Login</h2>
+
+    <p>
+      Enter your administrator password to upload and manage gallery photos.
+    </p>
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Admin password"
+      autocomplete="current-password"
+    >
+
+    <button id="loginButton">
+      Log In
+    </button>
+
+    <div id="loginMessage" class="message"></div>
+
+  </section>
+
+
+  <!-- ADMIN PANEL -->
+
+  <div id="adminPanel" class="hidden">
+
+    <section class="card">
+
+      <div class="top-row">
+
+        <div>
+          <h2 style="margin-bottom: 5px;">
+            Upload Photos
+          </h2>
+
+          <div style="color: #777;">
+            Choose a gallery and upload new pictures.
+          </div>
+        </div>
+
+        <button
+          class="logout"
+          id="logoutButton"
+        >
+          Log Out
+        </button>
+
+      </div>
+
+      <br>
+
+      <label for="gallery">
+        <strong>Choose Gallery</strong>
+      </label>
+
+      <select id="gallery"></select>
+
+
+      <div
+        class="drop-zone"
+        id="dropZone"
+      >
+
+        <strong>
+          Drop photos here
+        </strong>
+
+        or click to choose pictures
+
+        <br><br>
+
+        <span style="color: #777;">
+          You can select multiple photos at once.
+        </span>
+
+      </div>
+
+
+      <input
+        type="file"
+        id="fileInput"
+        accept="image/*"
+        multiple
+      >
+
+
+      <div
+        id="selectedFiles"
+        class="selected-files"
+      ></div>
+
+
+      <button
+        id="uploadButton"
+        disabled
+      >
+        Upload Photos
+      </button>
+
+
+      <div
+        id="progressWrap"
+        class="progress-wrap"
+      >
+
+        <div class="progress-bar">
+
+          <div
+            id="progress"
+            class="progress"
+          ></div>
+
+        </div>
+
+        <p id="progressText"></p>
+
+      </div>
+
+
+      <div
+        id="uploadMessage"
+        class="message"
+      ></div>
+
+    </section>
+
+
+    <!-- UPLOADED PHOTOS -->
+
+    <section class="card">
+
+      <h2>Uploaded Photos</h2>
+
+      <p style="color: #777;">
+        Photos uploaded to the selected gallery will appear below.
+      </p>
+
+      <div
+        id="photoGrid"
+        class="gallery-grid"
+      ></div>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<script>
+
+let adminPassword = "";
+let selectedFiles = [];
+
+const loginCard =
+  document.getElementById("loginCard");
+
+const adminPanel =
+  document.getElementById("adminPanel");
+
+const passwordInput =
+  document.getElementById("password");
+
+const loginButton =
+  document.getElementById("loginButton");
+
+const loginMessage =
+  document.getElementById("loginMessage");
+
+const gallerySelect =
+  document.getElementById("gallery");
+
+const dropZone =
+  document.getElementById("dropZone");
+
+const fileInput =
+  document.getElementById("fileInput");
+
+const uploadButton =
+  document.getElementById("uploadButton");
+
+const selectedFilesDiv =
+  document.getElementById("selectedFiles");
+
+const uploadMessage =
+  document.getElementById("uploadMessage");
+
+const progressWrap =
+  document.getElementById("progressWrap");
+
+const progress =
+  document.getElementById("progress");
+
+const progressText =
+  document.getElementById("progressText");
+
+const photoGrid =
+  document.getElementById("photoGrid");
+
+
+// -----------------------------------------
+// LOGIN
+// -----------------------------------------
+
+loginButton.addEventListener(
+  "click",
+  login
+);
+
+passwordInput.addEventListener(
+  "keydown",
+  event => {
+
+    if (event.key === "Enter") {
+      login();
+    }
+
+  }
+);
+
+
+async function login() {
+
+  const password =
+    passwordInput.value;
+
+  loginMessage.className =
+    "message";
+
+  if (!password) {
+
+    showMessage(
+      loginMessage,
+      "Please enter your password.",
+      false
+    );
+
+    return;
+  }
+
+
+  loginButton.disabled = true;
+
+  loginButton.textContent =
+    "Logging in...";
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/admin/login",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            password: password
+          })
         }
-      });
+      );
 
-    // --------------------------------------------------
-    // ADMIN PASSWORD CHECK
-    // --------------------------------------------------
-    function adminAuthorized(request) {
-      const password = request.headers.get("X-Admin-Password") || "";
-      return !!env.ADMIN_PASSWORD && password === env.ADMIN_PASSWORD;
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.error ||
+        "Login failed."
+      );
+
     }
 
-    // --------------------------------------------------
-    // ALLOWED GALLERIES
-    // --------------------------------------------------
-    const galleries = {
-      "bells-homecoming-2026": "Bells Homecoming 2026",
-      "heritage-vs-rl-turner": "Heritage vs RL Turner",
-      "leonard-volleyball-26-27": "Leonard Volleyball 26-27"
-    };
 
-    // --------------------------------------------------
-    // ADMIN LOGIN CHECK
-    // --------------------------------------------------
-    if (url.pathname === "/api/admin/login") {
-      if (request.method !== "POST") {
-        return new Response("Method Not Allowed", { status: 405 });
-      }
+    adminPassword = password;
 
-      let body;
 
-      try {
-        body = await request.json();
-      } catch {
-        return json(
-          { ok: false, error: "Invalid request." },
-          400
-        );
-      }
+    gallerySelect.innerHTML = "";
 
-      const password = String(body.password || "");
 
-      if (!env.ADMIN_PASSWORD || password !== env.ADMIN_PASSWORD) {
-        return json(
-          { ok: false, error: "Incorrect password." },
-          401
-        );
-      }
+    Object.entries(
+      data.galleries
+    ).forEach(
+      ([value, label]) => {
 
-      return json({
-        ok: true,
-        galleries
-      });
-    }
-
-    // --------------------------------------------------
-    // UPLOAD PHOTO TO R2
-    // --------------------------------------------------
-    if (url.pathname === "/api/admin/upload") {
-      if (request.method !== "POST") {
-        return new Response("Method Not Allowed", { status: 405 });
-      }
-
-      if (!adminAuthorized(request)) {
-        return json(
-          { ok: false, error: "Unauthorized." },
-          401
-        );
-      }
-
-      const gallery = url.searchParams.get("gallery") || "";
-
-      if (!galleries[gallery]) {
-        return json(
-          { ok: false, error: "Unknown gallery." },
-          400
-        );
-      }
-
-      const contentType =
-        request.headers.get("Content-Type") ||
-        "application/octet-stream";
-
-      if (!contentType.startsWith("image/")) {
-        return json(
-          { ok: false, error: "Only image files are allowed." },
-          400
-        );
-      }
-
-      const originalName =
-        request.headers.get("X-File-Name") || "photo.jpg";
-
-      const safeName = originalName
-        .replace(/[^A-Za-z0-9_.-]/g, "_")
-        .replace(/_+/g, "_");
-
-      const uniqueName =
-        `${Date.now()}-${crypto.randomUUID()}-${safeName}`;
-
-      const key = `${gallery}/${uniqueName}`;
-
-      try {
-        await env.Photos.put(key, request.body, {
-          httpMetadata: {
-            contentType
-          },
-          customMetadata: {
-            originalName: safeName,
-            gallery
-          }
-        });
-
-        return json({
-          ok: true,
-          key,
-          file: uniqueName,
-          url: `/api/photo/${encodeURIComponent(gallery)}/${encodeURIComponent(uniqueName)}`
-        });
-      } catch (error) {
-        return json(
-          {
-            ok: false,
-            error: "Upload failed."
-          },
-          500
-        );
-      }
-    }
-
-    // --------------------------------------------------
-    // LIST PHOTOS IN A GALLERY
-    // --------------------------------------------------
-    if (url.pathname === "/api/admin/photos") {
-      if (!adminAuthorized(request)) {
-        return json(
-          { ok: false, error: "Unauthorized." },
-          401
-        );
-      }
-
-      const gallery = url.searchParams.get("gallery") || "";
-
-      if (!galleries[gallery]) {
-        return json(
-          { ok: false, error: "Unknown gallery." },
-          400
-        );
-      }
-
-      try {
-        const result = await env.Photos.list({
-          prefix: `${gallery}/`
-        });
-
-        const photos = result.objects.map(object => {
-          const file = object.key.substring(
-            `${gallery}/`.length
+        const option =
+          document.createElement(
+            "option"
           );
 
-          return {
-            key: object.key,
-            file,
-            size: object.size,
-            uploaded: object.uploaded,
-            url: `/api/photo/${encodeURIComponent(gallery)}/${encodeURIComponent(file)}`
-          };
-        });
+        option.value = value;
 
-        return json({
-          ok: true,
-          photos
-        });
-      } catch {
-        return json(
-          { ok: false, error: "Could not load photos." },
-          500
+        option.textContent =
+          label;
+
+        gallerySelect.appendChild(
+          option
         );
+
       }
+    );
+
+
+    loginCard.classList.add(
+      "hidden"
+    );
+
+    adminPanel.classList.remove(
+      "hidden"
+    );
+
+
+    await loadPhotos();
+
+  }
+
+  catch (error) {
+
+    showMessage(
+      loginMessage,
+      error.message,
+      false
+    );
+
+  }
+
+  finally {
+
+    loginButton.disabled = false;
+
+    loginButton.textContent =
+      "Log In";
+
+  }
+
+}
+
+
+// -----------------------------------------
+// LOG OUT
+// -----------------------------------------
+
+document
+  .getElementById("logoutButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      adminPassword = "";
+
+      passwordInput.value = "";
+
+      selectedFiles = [];
+
+      updateSelectedFiles();
+
+      adminPanel.classList.add(
+        "hidden"
+      );
+
+      loginCard.classList.remove(
+        "hidden"
+      );
+
+    }
+  );
+
+
+// -----------------------------------------
+// CHANGE GALLERY
+// -----------------------------------------
+
+gallerySelect.addEventListener(
+  "change",
+  () => {
+
+    selectedFiles = [];
+
+    fileInput.value = "";
+
+    updateSelectedFiles();
+
+    uploadMessage.className =
+      "message";
+
+    loadPhotos();
+
+  }
+);
+
+
+// -----------------------------------------
+// CLICK TO CHOOSE FILES
+// -----------------------------------------
+
+dropZone.addEventListener(
+  "click",
+  () => {
+
+    fileInput.click();
+
+  }
+);
+
+
+fileInput.addEventListener(
+  "change",
+  event => {
+
+    selectedFiles =
+      Array.from(
+        event.target.files
+      ).filter(
+        file =>
+          file.type.startsWith(
+            "image/"
+          )
+      );
+
+    updateSelectedFiles();
+
+  }
+);
+
+
+// -----------------------------------------
+// DRAG AND DROP
+// -----------------------------------------
+
+dropZone.addEventListener(
+  "dragover",
+  event => {
+
+    event.preventDefault();
+
+    dropZone.classList.add(
+      "dragover"
+    );
+
+  }
+);
+
+
+dropZone.addEventListener(
+  "dragleave",
+  () => {
+
+    dropZone.classList.remove(
+      "dragover"
+    );
+
+  }
+);
+
+
+dropZone.addEventListener(
+  "drop",
+  event => {
+
+    event.preventDefault();
+
+    dropZone.classList.remove(
+      "dragover"
+    );
+
+
+    selectedFiles =
+      Array.from(
+        event.dataTransfer.files
+      ).filter(
+        file =>
+          file.type.startsWith(
+            "image/"
+          )
+      );
+
+
+    updateSelectedFiles();
+
+  }
+);
+
+
+// -----------------------------------------
+// DISPLAY SELECTED FILE COUNT
+// -----------------------------------------
+
+function updateSelectedFiles() {
+
+  if (selectedFiles.length === 0) {
+
+    selectedFilesDiv.innerHTML = "";
+
+    uploadButton.disabled = true;
+
+    return;
+  }
+
+
+  selectedFilesDiv.innerHTML =
+    "<strong>" +
+    selectedFiles.length +
+    "</strong> photo(s) selected";
+
+
+  uploadButton.disabled = false;
+
+}
+
+
+// -----------------------------------------
+// UPLOAD PHOTOS
+// -----------------------------------------
+
+uploadButton.addEventListener(
+  "click",
+  uploadPhotos
+);
+
+
+async function uploadPhotos() {
+
+  if (selectedFiles.length === 0) {
+    return;
+  }
+
+
+  uploadButton.disabled = true;
+
+  uploadMessage.className =
+    "message";
+
+  progressWrap.style.display =
+    "block";
+
+  progress.style.width =
+    "0%";
+
+
+  const gallery =
+    gallerySelect.value;
+
+
+  let completed = 0;
+
+
+  try {
+
+    for (const file of selectedFiles) {
+
+      progressText.textContent =
+        "Uploading " +
+        (completed + 1) +
+        " of " +
+        selectedFiles.length +
+        ": " +
+        file.name;
+
+
+      const response =
+        await fetch(
+          "/api/admin/upload?gallery=" +
+          encodeURIComponent(
+            gallery
+          ),
+          {
+            method: "POST",
+
+            headers: {
+
+              "X-Admin-Password":
+                adminPassword,
+
+              "X-File-Name":
+                file.name,
+
+              "Content-Type":
+                file.type ||
+                "application/octet-stream"
+
+            },
+
+            body: file
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          "Could not upload " +
+          file.name
+        );
+
+      }
+
+
+      completed++;
+
+
+      const percent =
+        Math.round(
+          completed /
+          selectedFiles.length *
+          100
+        );
+
+
+      progress.style.width =
+        percent + "%";
+
     }
 
-    // --------------------------------------------------
-    // DELETE PHOTO FROM R2
-    // --------------------------------------------------
-    if (url.pathname === "/api/admin/delete") {
-      if (request.method !== "POST") {
-        return new Response("Method Not Allowed", { status: 405 });
-      }
 
-      if (!adminAuthorized(request)) {
-        return json(
-          { ok: false, error: "Unauthorized." },
-          401
-        );
-      }
+    progressText.textContent =
+      "Upload complete!";
 
-      let body;
 
-      try {
-        body = await request.json();
-      } catch {
-        return json(
-          { ok: false, error: "Invalid request." },
-          400
-        );
-      }
+    showMessage(
+      uploadMessage,
+      completed +
+      " photo(s) uploaded successfully.",
+      true
+    );
 
-      const gallery = String(body.gallery || "");
-      const file = String(body.file || "");
 
-      if (!galleries[gallery]) {
-        return json(
-          { ok: false, error: "Unknown gallery." },
-          400
-        );
-      }
+    selectedFiles = [];
 
-      if (
-        !file ||
-        file.includes("/") ||
-        file.includes("\\") ||
-        file.includes("..")
-      ) {
-        return json(
-          { ok: false, error: "Invalid file." },
-          400
-        );
-      }
+    fileInput.value = "";
 
-      try {
-        await env.Photos.delete(`${gallery}/${file}`);
+    updateSelectedFiles();
 
-        return json({
-          ok: true
-        });
-      } catch {
-        return json(
-          { ok: false, error: "Delete failed." },
-          500
-        );
-      }
-    }
 
-    // --------------------------------------------------
-    // SERVE AN R2 PHOTO PUBLICLY THROUGH THE WORKER
-    // --------------------------------------------------
-    if (url.pathname.startsWith("/api/photo/")) {
-      if (request.method !== "GET") {
-        return new Response("Method Not Allowed", { status: 405 });
-      }
+    await loadPhotos();
 
-      const parts = url.pathname
-        .split("/")
-        .filter(Boolean)
-        .map(decodeURIComponent);
+  }
 
-      // api / photo / gallery / filename
-      if (parts.length !== 4) {
-        return new Response("Not Found", { status: 404 });
-      }
+  catch (error) {
 
-      const gallery = parts[2];
-      const file = parts[3];
+    showMessage(
+      uploadMessage,
+      error.message,
+      false
+    );
 
-      if (!galleries[gallery]) {
-        return new Response("Not Found", { status: 404 });
-      }
+  }
 
-      if (
-        !file ||
-        file.includes("/") ||
-        file.includes("\\") ||
-        file.includes("..")
-      ) {
-        return new Response("Not Found", { status: 404 });
-      }
+  finally {
 
-      const object = await env.Photos.get(
-        `${gallery}/${file}`
-      );
+    uploadButton.disabled =
+      selectedFiles.length === 0;
 
-      if (!object) {
-        return new Response("Image not found.", {
-          status: 404
-        });
-      }
+  }
 
-      const headers = new Headers();
+}
 
-      object.writeHttpMetadata(headers);
 
-      headers.set(
-        "ETag",
-        object.httpEtag
-      );
+// -----------------------------------------
+// LOAD PHOTOS FROM R2
+// -----------------------------------------
 
-      headers.set(
-        "Cache-Control",
-        "public, max-age=3600"
-      );
+async function loadPhotos() {
 
-      return new Response(object.body, {
-        headers
-      });
-    }
+  photoGrid.innerHTML =
+    "<p>Loading photos...</p>";
 
-    // --------------------------------------------------
-    // EXISTING PASSWORD-PROTECTED ORIGINAL DOWNLOAD
-    // --------------------------------------------------
-    if (url.pathname === "/api/download") {
-      if (request.method !== "POST") {
-        return new Response("Method Not Allowed", {
-          status: 405
-        });
-      }
 
-      let body;
+  const gallery =
+    gallerySelect.value;
 
-      try {
-        body = await request.json();
-      } catch {
-        return json(
-          { ok: false, error: "Invalid request." },
-          400
-        );
-      }
 
-      const gallery = String(body.gallery || "");
+  try {
 
-      const file = String(body.file || "")
-        .replace(/[^A-Za-z0-9_.-]/g, "");
-
-      const password = String(body.password || "");
-
-      let expected;
-      let folder;
-
-      if (gallery === "leonard-volleyball-26-27") {
-        expected = env.LEONARD_DOWNLOAD_PASSWORD;
-        folder = "leonard-volleyball-26-27";
-      } else if (gallery === "heritage-vs-rl-turner") {
-        expected = env.HERITAGE_DOWNLOAD_PASSWORD;
-        folder = "heritage-vs-rl-turner";
-      } else {
-        return json(
-          { ok: false, error: "Unknown gallery." },
-          400
-        );
-      }
-
-      if (!expected || password !== expected) {
-        return json(
-          { ok: false, error: "Incorrect password." },
-          401
-        );
-      }
-
-      const assetURL = new URL(
-        `/assets/images/${folder}/${file}`,
-        url.origin
-      );
-
-      const assetResponse = await env.ASSETS.fetch(
-        new Request(assetURL, request)
-      );
-
-      if (!assetResponse.ok) {
-        return new Response(
-          "Image not found.",
-          { status: 404 }
-        );
-      }
-
-      const headers = new Headers(
-        assetResponse.headers
-      );
-
-      headers.set(
-        "Content-Disposition",
-        `attachment; filename="${file}"`
-      );
-
-      headers.set(
-        "Cache-Control",
-        "private, no-store"
-      );
-
-      return new Response(
-        assetResponse.body,
+    const response =
+      await fetch(
+        "/api/admin/photos?gallery=" +
+        encodeURIComponent(
+          gallery
+        ),
         {
-          status: 200,
-          headers
+          headers: {
+
+            "X-Admin-Password":
+              adminPassword
+
+          }
         }
       );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.error ||
+        "Could not load photos."
+      );
+
     }
 
-    // --------------------------------------------------
-    // EVERYTHING ELSE = EXISTING WEBSITE
-    // --------------------------------------------------
-    return env.ASSETS.fetch(request);
+
+    if (data.photos.length === 0) {
+
+      photoGrid.innerHTML =
+        "<p>No uploaded photos in this gallery yet.</p>";
+
+      return;
+    }
+
+
+    photoGrid.innerHTML = "";
+
+
+    data.photos.forEach(
+      photo => {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+        card.className =
+          "photo-card";
+
+
+        const img =
+          document.createElement(
+            "img"
+          );
+
+        img.src =
+          photo.url;
+
+        img.alt =
+          "Gallery photo";
+
+        img.loading =
+          "lazy";
+
+
+        const info =
+          document.createElement(
+            "div"
+          );
+
+        info.className =
+          "photo-info";
+
+
+        const filename =
+          document.createElement(
+            "div"
+          );
+
+        filename.className =
+          "filename";
+
+        filename.textContent =
+          photo.file;
+
+
+        const deleteButton =
+          document.createElement(
+            "button"
+          );
+
+        deleteButton.className =
+          "delete-btn";
+
+        deleteButton.textContent =
+          "Delete";
+
+
+        deleteButton.addEventListener(
+          "click",
+          () => {
+
+            deletePhoto(
+              photo.file
+            );
+
+          }
+        );
+
+
+        info.appendChild(
+          filename
+        );
+
+        info.appendChild(
+          deleteButton
+        );
+
+
+        card.appendChild(
+          img
+        );
+
+        card.appendChild(
+          info
+        );
+
+
+        photoGrid.appendChild(
+          card
+        );
+
+      }
+    );
+
   }
-};
+
+  catch (error) {
+
+    photoGrid.innerHTML =
+      "<p>" +
+      escapeHTML(
+        error.message
+      ) +
+      "</p>";
+
+  }
+
+}
+
+
+// -----------------------------------------
+// DELETE PHOTO
+// -----------------------------------------
+
+async function deletePhoto(file) {
+
+  const confirmed =
+    confirm(
+      "Are you sure you want to delete this photo? This cannot be undone."
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/admin/delete",
+        {
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json",
+
+            "X-Admin-Password":
+              adminPassword
+
+          },
+
+          body: JSON.stringify({
+
+            gallery:
+              gallerySelect.value,
+
+            file: file
+
+          })
+
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.error ||
+        "Delete failed."
+      );
+
+    }
+
+
+    await loadPhotos();
+
+  }
+
+  catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+// -----------------------------------------
+// MESSAGE HELPER
+// -----------------------------------------
+
+function showMessage(
+  element,
+  text,
+  success
+) {
+
+  element.textContent =
+    text;
+
+  element.className =
+    success
+      ? "message success"
+      : "message error";
+
+}
+
+
+// -----------------------------------------
+// SAFE TEXT HELPER
+// -----------------------------------------
+
+function escapeHTML(value) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+  div.textContent =
+    value;
+
+  return div.innerHTML;
+
+}
+
+</script>
+
+</body>
+</html>
