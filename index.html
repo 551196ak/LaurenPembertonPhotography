@@ -1,1 +1,500 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lauren Pemberton Photography</title><link rel="stylesheet" href="assets/css/style.css?v=7"></head><body><header><nav class="nav"><a class="brand" href="index.html">Lauren Pemberton Photography</a><div class="links"><a href="index.html">Home</a><a href="index.html#galleries">Galleries</a><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></div></nav></header><main><section class="hero"><div class="hero-copy"><div class="eyebrow">Sports • Events • Stories</div><h1>Moments in motion.</h1><p>Authentic photography built around the energy, emotion, and stories worth remembering.</p></div></section><section class="section" id="galleries"><div class="section-head"><div><div class="eyebrow">Recent work</div><h2>Galleries</h2></div><p>Browse recent games and events. New collections can be added as individual event galleries.</p></div><div class="cards"><a class="card" href="heritage-vs-rl-turner.html"><img src="assets/images/heritage-vs-rl-turner/IMG_2399.PNG"><div class="shade"></div><div class="card-copy"><span>Football</span><h3>Heritage vs. RL Turner</h3><span>View Gallery →</span></div></a><a class="card" href="leonard-volleyball-26-27.html"><img src="assets/images/leonard-volleyball-26-27/IMG_2406.jpg"><div class="shade"></div><div class="card-copy"><span>Volleyball</span><h3>Leonard Volleyball 26–27</h3><span>View Gallery →</span></div></a><a class="card wip" href="bells-homecoming-2026.html"><div class="card-copy"><span>Homecoming</span><h3>Bells Homecoming 2026</h3><span>Photos Coming Soon</span></div></a></div></section><section class="section about" id="about"><div><div class="eyebrow">Behind the lens</div><h2>Lauren Pemberton Photography</h2></div><div><p>A portfolio centered on the moments that happen fast: the anticipation before the play, the celebration after the point, and the people who make each event memorable.</p><p>This demo is ready to grow with new sports, school events, senior sessions, and other collections.</p><a class="button" href="#contact">Get in touch</a></div></section><section class="section" id="contact"><div class="section-head"><div><div class="eyebrow">Contact</div><h2>Let’s capture it.</h2></div><p>Contact information and social links can be added here once they are ready.</p></div></section></main><footer>© 2026 Lauren Pemberton Photography</footer></body></html>
+<!doctype html>
+
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>
+    Gallery | Lauren Pemberton Photography
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="assets/css/style.css?v=7"
+  >
+
+  <style>
+
+    .dynamic-gallery {
+      max-width: 1400px;
+      margin: auto;
+      padding: 60px 30px;
+    }
+
+    .gallery-header {
+      margin-bottom: 40px;
+    }
+
+    .gallery-header h1 {
+      margin-bottom: 10px;
+    }
+
+    .gallery-description {
+      max-width: 700px;
+      opacity: .75;
+    }
+
+    .photo-grid {
+      columns: 3;
+      column-gap: 16px;
+    }
+
+    .photo {
+      width: 100%;
+      display: block;
+      margin-bottom: 16px;
+      break-inside: avoid;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .empty-gallery {
+      padding: 80px 20px;
+      text-align: center;
+      opacity: .7;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 25px;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.94);
+      z-index: 9999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 25px;
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 92vh;
+      object-fit: contain;
+    }
+
+    .lightbox-close {
+      position: fixed;
+      right: 25px;
+      top: 20px;
+      color: white;
+      font-size: 36px;
+      cursor: pointer;
+      z-index: 10000;
+    }
+
+    @media(max-width:900px) {
+
+      .photo-grid {
+        columns: 2;
+      }
+
+    }
+
+    @media(max-width:600px) {
+
+      .dynamic-gallery {
+        padding: 35px 18px;
+      }
+
+      .photo-grid {
+        columns: 1;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<header>
+
+  <nav class="nav">
+
+    <a
+      class="brand"
+      href="index.html"
+    >
+      Lauren Pemberton Photography
+    </a>
+
+    <div class="links">
+
+      <a href="index.html">
+        Home
+      </a>
+
+      <a href="index.html#galleries">
+        Galleries
+      </a>
+
+      <a href="index.html#about">
+        About
+      </a>
+
+      <a href="index.html#contact">
+        Contact
+      </a>
+
+    </div>
+
+  </nav>
+
+</header>
+
+
+<main class="dynamic-gallery">
+
+  <a
+    class="back-link"
+    href="index.html#galleries"
+  >
+    ← Back to Galleries
+  </a>
+
+
+  <div
+    id="galleryHeader"
+    class="gallery-header"
+  >
+
+    <div class="eyebrow">
+      Lauren Pemberton Photography
+    </div>
+
+    <h1 id="galleryTitle">
+      Loading Gallery...
+    </h1>
+
+    <p
+      id="galleryDate"
+      class="gallery-description"
+    ></p>
+
+    <p
+      id="galleryDescription"
+      class="gallery-description"
+    ></p>
+
+  </div>
+
+
+  <div
+    id="photoGrid"
+    class="photo-grid"
+  ></div>
+
+</main>
+
+
+<div
+  id="lightbox"
+  class="lightbox"
+>
+
+  <div
+    id="lightboxClose"
+    class="lightbox-close"
+  >
+    ×
+  </div>
+
+  <img
+    id="lightboxImage"
+    alt="Full size photograph"
+  >
+
+</div>
+
+
+<footer>
+  © 2026 Lauren Pemberton Photography
+</footer>
+
+
+<script>
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const galleryId =
+  params.get("id");
+
+
+const titleElement =
+  document.getElementById(
+    "galleryTitle"
+  );
+
+const dateElement =
+  document.getElementById(
+    "galleryDate"
+  );
+
+const descriptionElement =
+  document.getElementById(
+    "galleryDescription"
+  );
+
+const photoGrid =
+  document.getElementById(
+    "photoGrid"
+  );
+
+
+async function loadGallery() {
+
+  if(!galleryId) {
+
+    titleElement.textContent =
+      "Gallery Not Found";
+
+    return;
+
+  }
+
+
+  try {
+
+    // Get gallery information
+
+    const galleryResponse =
+      await fetch(
+        "/api/galleries",
+        {
+          cache: "no-store"
+        }
+      );
+
+    const galleryData =
+      await galleryResponse.json();
+
+
+    const gallery =
+      galleryData.galleries.find(
+        item =>
+          item.id === galleryId
+      );
+
+
+    if(!gallery) {
+
+      titleElement.textContent =
+        "Gallery Not Found";
+
+      return;
+
+    }
+
+
+    document.title =
+      gallery.title +
+      " | Lauren Pemberton Photography";
+
+
+    titleElement.textContent =
+      gallery.title;
+
+
+    if(gallery.date) {
+
+      dateElement.textContent =
+        gallery.date;
+
+    }
+
+
+    if(gallery.description) {
+
+      descriptionElement.textContent =
+        gallery.description;
+
+    }
+
+
+    // Get photos
+
+    const photoResponse =
+      await fetch(
+        "/api/gallery/photos?gallery=" +
+        encodeURIComponent(
+          galleryId
+        ),
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    const photoData =
+      await photoResponse.json();
+
+
+    if(
+      !photoData.photos ||
+      !photoData.photos.length
+    ) {
+
+      photoGrid.innerHTML =
+        '<div class="empty-gallery">' +
+        '<h2>Photos Coming Soon</h2>' +
+        '<p>This gallery has been created, but photos have not been uploaded yet.</p>' +
+        '</div>';
+
+      return;
+
+    }
+
+
+    for(
+      const photo
+      of photoData.photos
+    ) {
+
+      const image =
+        document.createElement(
+          "img"
+        );
+
+      image.src =
+        photo.url;
+
+      image.alt =
+        gallery.title;
+
+      image.loading =
+        "lazy";
+
+      image.className =
+        "photo";
+
+
+      image.onclick =
+        () =>
+          openLightbox(
+            photo.url
+          );
+
+
+      photoGrid.appendChild(
+        image
+      );
+
+    }
+
+  }
+
+  catch(error) {
+
+    titleElement.textContent =
+      "Unable to Load Gallery";
+
+    photoGrid.innerHTML =
+      "<p>Please try again later.</p>";
+
+  }
+
+}
+
+
+// LIGHTBOX
+
+const lightbox =
+  document.getElementById(
+    "lightbox"
+  );
+
+const lightboxImage =
+  document.getElementById(
+    "lightboxImage"
+  );
+
+
+function openLightbox(src) {
+
+  lightboxImage.src =
+    src;
+
+  lightbox.classList.add(
+    "open"
+  );
+
+  document.body.style.overflow =
+    "hidden";
+
+}
+
+
+function closeLightbox() {
+
+  lightbox.classList.remove(
+    "open"
+  );
+
+  lightboxImage.src = "";
+
+  document.body.style.overflow =
+    "";
+
+}
+
+
+document
+  .getElementById(
+    "lightboxClose"
+  )
+  .onclick =
+    closeLightbox;
+
+
+lightbox.onclick =
+  event => {
+
+    if(
+      event.target ===
+      lightbox
+    ) {
+      closeLightbox();
+    }
+
+  };
+
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(event.key === "Escape") {
+      closeLightbox();
+    }
+
+  }
+);
+
+
+loadGallery();
+
+</script>
+
+</body>
+
+</html>
