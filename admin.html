@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Manager | Lauren Pemberton Photography</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f7f5f2;
+      color: #252525;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-family: Georgia, serif;
+      font-weight: 400;
+      font-size: 30px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #777;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 35px auto;
+      padding: 0 20px 60px;
+    }
+
+    .card {
+      background: white;
+      padding: 28px;
+      border-radius: 14px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.08);
+      margin-bottom: 25px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-family: Georgia, serif;
+      font-weight: 400;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 13px;
+      border-radius: 7px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    input,
+    select {
+      margin-bottom: 15px;
+      background: white;
+    }
+
+    button {
+      border: none;
+      background: #252525;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: .85;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .drop-zone {
+      border: 2px dashed #aaa;
+      border-radius: 12px;
+      padding: 45px 20px;
+      text-align: center;
+      margin: 20px 0;
+      background: #fafafa;
+      cursor: pointer;
+    }
+
+    .drop-zone.dragover {
+      background: #eee;
+      border-color: #333;
+    }
+
+    .drop-zone strong {
+      display: block;
+      font-size: 19px;
+      margin-bottom: 8px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 7px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .success {
+      display: block;
+      background: #e7f7ec;
+      color: #176b35;
+    }
+
+    .error {
+      display: block;
+      background: #fdeaea;
+      color: #9d2020;
+    }
+
+    .progress-wrap {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: #333;
+      transition: width .2s;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fill, minmax(180px, 1fr));
+      gap: 18px;
+      margin-top: 25px;
+    }
+
+    .photo-card {
+      background: #fafafa;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-info {
+      padding: 10px;
+    }
+
+    .filename {
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 8px;
+    }
+
+    .delete-btn {
+      background: #8b2929;
+      font-size: 13px;
+      padding: 9px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logout {
+      width: auto;
+      padding: 10px 18px;
+      background: #777;
+    }
+
+    @media(max-width:600px) {
+      header h1 {
+        font-size: 25px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .gallery-grid {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+      .photo-card img {
+        height: 135px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Lauren Pemberton Photography</h1>
+  <p>Photo Manager</p>
+</header>
+
+<main>
+
+  <!-- LOGIN -->
+
+  <section id="loginCard" class="card">
+
+    <h2>Photographer Login</h2>
+
+    <p>
+      Enter your administrator password to manage your galleries.
+    </p>
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Admin password"
+    >
+
+    <button id="loginButton">
+      Log In
+    </button>
+
+    <div id="loginMessage" class="message"></div>
+
+  </section>
+
+
+  <!-- ADMIN PANEL -->
+
+  <div id="adminPanel" class="hidden">
+
+    <section class="card">
+
+      <div class="top-row">
+
+        <div>
+          <h2 style="margin-bottom:5px;">
+            Upload Photos
+          </h2>
+
+          <div style="color:#777;">
+            Choose a gallery and upload new pictures.
+          </div>
+        </div>
+
+        <button
+          class="logout"
+          id="logoutButton"
+        >
+          Log Out
+        </button>
+
+      </div>
+
+      <br>
+
+      <label for="gallery">
+        <strong>Gallery</strong>
+      </label>
+
+      <select id="gallery"></select>
+
+
+      <div
+        class="drop-zone"
+        id="dropZone"
+      >
+
+        <strong>
+          Drop photos here
+        </strong>
+
+        or click to choose pictures
+
+        <br><br>
+
+        <span style="color:#777;">
+          JPG, PNG, WEBP and other browser-supported images
+        </span>
+
+      </div>
+
+
+      <input
+        type="file"
+        id="fileInput"
+        accept="image/*"
+        multiple
+      >
+
+
+      <div id="selectedFiles"></div>
+
+
+      <button
+        id="uploadButton"
+        disabled
+      >
+        Upload Photos
+      </button>
+
+
+      <div
+        id="progressWrap"
+        class="progress-wrap"
+      >
+
+        <div class="progress-bar">
+          <div
+            id="progress"
+            class="progress"
+          ></div>
+        </div>
+
+        <p id="progressText"></p>
+
+      </div>
+
+
+      <div
+        id="uploadMessage"
+        class="message"
+      ></div>
+
+    </section>
+
+
+    <!-- EXISTING PHOTOS -->
+
+    <section class="card">
+
+      <h2>Gallery Photos</h2>
+
+      <p style="color:#777;">
+        Photos uploaded through this manager
+        will appear below.
+      </p>
+
+      <div
+        id="photoGrid"
+        class="gallery-grid"
+      ></div>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<script>
+
+let adminPassword = "";
+let selectedFiles = [];
+
+const loginCard =
+  document.getElementById("loginCard");
+
+const adminPanel =
+  document.getElementById("adminPanel");
+
+const passwordInput =
+  document.getElementById("password");
+
+const loginButton =
+  document.getElementById("loginButton");
+
+const loginMessage =
+  document.getElementById("loginMessage");
+
+const gallerySelect =
+  document.getElementById("gallery");
+
+const dropZone =
+  document.getElementById("dropZone");
+
+const fileInput =
+  document.getElementById("fileInput");
+
+const uploadButton =
+  document.getElementById("uploadButton");
+
+const selectedFilesDiv =
+  document.getElementById("selectedFiles");
+
+const uploadMessage =
+  document.getElementById("uploadMessage");
+
+const progressWrap =
+  document.getElementById("progressWrap");
+
+const progress =
+  document.getElementById("progress");
+
+const progressText =
+  document.getElementById("progressText");
+
+const photoGrid =
+  document.getElementById("photoGrid");
+
+
+// LOGIN
+
+loginButton.addEventListener(
+  "click",
+  login
+);
+
+passwordInput.addEventListener(
+  "keydown",
+  event => {
+
+    if(event.key === "Enter") {
+      login();
+    }
+
+  }
+);
+
+
+async function login() {
+
+  const password =
+    passwordInput.value;
+
+  loginMessage.className =
+    "message";
+
+  if(!password) {
+    showMessage(
+      loginMessage,
+      "Enter your password.",
+      false
+    );
+    return;
+  }
+
+  loginButton.disabled = true;
+  loginButton.textContent =
+    "Logging in...";
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/admin/login",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            password
+          })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if(!response.ok) {
+      throw new Error(
+        data.error ||
+        "Login failed."
+      );
+    }
+
+    adminPassword = password;
+
+    gallerySelect.innerHTML = "";
+
+    Object.entries(
+      data.galleries
+    ).forEach(
+      ([value,label]) => {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value = value;
+        option.textContent = label;
+
+        gallerySelect.appendChild(
+          option
+        );
+
+      }
+    );
+
+    loginCard.classList.add(
+      "hidden"
+    );
+
+    adminPanel.classList.remove(
+      "hidden"
+    );
+
+    await loadPhotos();
+
+  }
+  catch(error) {
+
+    showMessage(
+      loginMessage,
+      error.message,
+      false
+    );
+
+  }
+  finally {
+
+    loginButton.disabled = false;
+    loginButton.textContent =
+      "Log In";
+
+  }
+
+}
+
+
+// LOGOUT
+
+document
+  .getElementById("logoutButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      adminPassword = "";
+      passwordInput.value = "";
+
+      adminPanel.classList.add(
+        "hidden"
+      );
+
+      loginCard.classList.remove(
+        "hidden"
+      );
+
+    }
+  );
+
+
+// GALLERY CHANGE
+
+gallerySelect.addEventListener(
+  "change",
+  () => {
+
+    selectedFiles = [];
+    updateSelectedFiles();
+    loadPhotos();
+
+  }
+);
+
+
+// FILE PICKER
+
+dropZone.addEventListener(
+  "click",
+  () => fileInput.click()
+);
+
+fileInput.addEventListener(
+  "change",
+  event => {
+
+    selectedFiles =
+      Array.from(
+        event.target.files
+      );
+
+    updateSelectedFiles();
+
+  }
+);
+
+
+// DRAG AND DROP
+
+dropZone.addEventListener(
+  "dragover",
+  event => {
+
+    event.preventDefault();
+
+    dropZone.classList.add(
+      "dragover"
+    );
+
+  }
+);
+
+dropZone.addEventListener(
+  "dragleave",
+  () => {
+
+    dropZone.classList.remove(
+      "dragover"
+    );
+
+  }
+);
+
+dropZone.addEventListener(
+  "drop",
+  event => {
+
+    event.preventDefault();
+
+    dropZone.classList.remove(
+      "dragover"
+    );
+
+    selectedFiles =
+      Array.from(
+        event.dataTransfer.files
+      ).filter(
+        file =>
+          file.type.startsWith(
+            "image/"
+          )
+      );
+
+    updateSelectedFiles();
+
+  }
+);
+
+
+function updateSelectedFiles() {
+
+  if(selectedFiles.length === 0) {
+
+    selectedFilesDiv.innerHTML = "";
+
+    uploadButton.disabled = true;
+
+    return;
+
+  }
+
+  selectedFilesDiv.innerHTML =
+    `<p><strong>${selectedFiles.length}</strong> photo(s) selected</p>`;
+
+  uploadButton.disabled = false;
+
+}
+
+
+// UPLOAD
+
+uploadButton.addEventListener(
+  "click",
+  uploadPhotos
+);
+
+
+async function uploadPhotos() {
+
+  if(selectedFiles.length === 0) {
+    return;
+  }
+
+  uploadButton.disabled = true;
+
+  uploadMessage.className =
+    "message";
+
+  progressWrap.style.display =
+    "block";
+
+  progress.style.width =
+    "0%";
+
+  const gallery =
+    gallerySelect.value;
+
+  let completed = 0;
+
+  try {
+
+    for(const file of selectedFiles) {
+
+      progressText.textContent =
+        `Uploading ${completed + 1} of ${selectedFiles.length}: ${file.name}`;
+
+      const response =
+        await fetch(
+          `/api/admin/upload?gallery=${encodeURIComponent(gallery)}`,
+          {
+            method: "POST",
+
+            headers: {
+              "X-Admin-Password":
+                adminPassword,
+
+              "X-File-Name":
+                file.name,
+
+              "Content-Type":
+                file.type ||
+                "application/octet-stream"
+            },
+
+            body: file
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if(!response.ok) {
+
+        throw new Error(
+          data.error ||
+          `Could not upload ${file.name}`
+        );
+
+      }
+
+      completed++;
+
+      const percent =
+        Math.round(
+          completed /
+          selectedFiles.length *
+          100
+        );
+
+      progress.style.width =
+        percent + "%";
+
+    }
+
+    progressText.textContent =
+      "Upload complete!";
+
+    showMessage(
+      uploadMessage,
+      `${completed} photo(s) uploaded successfully.`,
+      true
+    );
+
+    selectedFiles = [];
+    fileInput.value = "";
+
+    updateSelectedFiles();
+
+    await loadPhotos();
+
+  }
+  catch(error) {
+
+    showMessage(
+      uploadMessage,
+      error.message,
+      false
+    );
+
+  }
+  finally {
+
+    uploadButton.disabled =
+      selectedFiles.length === 0;
+
+  }
+
+}
+
+
+// LOAD PHOTOS
+
+async function loadPhotos() {
+
+  photoGrid.innerHTML =
+    "<p>Loading photos...</p>";
+
+  const gallery =
+    gallerySelect.value;
+
+  try {
+
+    const response =
+      await fetch(
+        `/api/admin/photos?gallery=${encodeURIComponent(gallery)}`,
+        {
+          headers: {
+            "X-Admin-Password":
+              adminPassword
+          }
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if(!response.ok) {
+
+      throw new Error(
+        data.error ||
+        "Could not load photos."
+      );
+
+    }
+
+    if(data.photos.length === 0) {
+
+      photoGrid.innerHTML =
+        "<p>No uploaded photos in this gallery yet.</p>";
+
+      return;
+
+    }
+
+    photoGrid.innerHTML = "";
+
+    data.photos.forEach(
+      photo => {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+        card.className =
+          "photo-card";
+
+        const img =
+          document.createElement(
+            "img"
+          );
+
+        img.src = photo.url;
+        img.alt = "Gallery photo";
+        img.loading = "lazy";
+
+        const info =
+          document.createElement(
+            "div"
+          );
+
+        info.className =
+          "photo-info";
+
+        const filename =
+          document.createElement(
+            "div"
+          );
+
+        filename.className =
+          "filename";
+
+        filename.textContent =
+          photo.file;
+
+        const deleteButton =
+          document.createElement(
+            "button"
+          );
+
+        deleteButton.className =
+          "delete-btn";
+
+        deleteButton.textContent =
+          "Delete";
+
+        deleteButton.addEventListener(
+          "click",
+          () =>
+            deletePhoto(
+              photo.file
+            )
+        );
+
+        info.appendChild(
+          filename
+        );
+
+        info.appendChild(
+          deleteButton
+        );
+
+        card.appendChild(img);
+        card.appendChild(info);
+
+        photoGrid.appendChild(card);
+
+      }
+    );
+
+  }
+  catch(error) {
+
+    photoGrid.innerHTML =
+      `<p>${escapeHTML(error.message)}</p>`;
+
+  }
+
+}
+
+
+// DELETE PHOTO
+
+async function deletePhoto(file) {
+
+  const confirmed =
+    confirm(
+      "Delete this photo? This cannot be undone."
+    );
+
+  if(!confirmed) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/admin/delete",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+
+            "X-Admin-Password":
+              adminPassword
+          },
+
+          body: JSON.stringify({
+            gallery:
+              gallerySelect.value,
+
+            file
+          })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if(!response.ok) {
+
+      throw new Error(
+        data.error ||
+        "Delete failed."
+      );
+
+    }
+
+    await loadPhotos();
+
+  }
+  catch(error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+function showMessage(
+  element,
+  text,
+  success
+) {
+
+  element.textContent = text;
+
+  element.className =
+    success
+      ? "message success"
+      : "message error";
+
+}
+
+
+function escapeHTML(value) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent = value;
+
+  return div.innerHTML;
+
+}
+
+</script>
+
+</body>
+</html>
